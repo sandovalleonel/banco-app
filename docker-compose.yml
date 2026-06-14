@@ -1,0 +1,65 @@
+services:
+  banco-db:
+    image: postgres:15-alpine
+    container_name: banco-db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: banco
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Ejecuta el script de inicialización de base de datos en el primer arranque
+      - ./database/BaseDatos.sql:/docker-entrypoint-initdb.d/BaseDatos.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d banco"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - banco-network
+
+  banco-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: banco-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      banco-db:
+        condition: service_healthy
+    environment:
+      DB_HOST: banco-db
+      DB_PORT: 5432
+      DB_NAME: banco
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    networks:
+      - banco-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  banco-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: banco-frontend
+    restart: always
+    ports:
+      - "4200:80"
+    networks:
+      - banco-network
+
+networks:
+  banco-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
