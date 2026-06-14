@@ -2,6 +2,7 @@ package com.banco.banco_api.modules.cliente.dto;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +22,8 @@ public class ClienteDto {
     private Long id;
 
     @NotBlank(message = "La identificación es obligatoria")
-    @Size(min = 5, max = 20, message = "La identificación debe tener entre 5 y 20 caracteres")
+    @Size(min = 5, max = 10, message = "La identificación debe tener entre 5 y 10 caracteres")
+    @Pattern(  regexp = "^\\S+$",  message = "La identificación no puede contener espacios en blanco en ningún lado")
     private String identificacion;
 
     @NotBlank(message = "El nombre es obligatorio")

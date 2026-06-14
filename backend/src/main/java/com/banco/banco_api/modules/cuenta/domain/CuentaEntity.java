@@ -3,6 +3,9 @@ package com.banco.banco_api.modules.cuenta.domain;
 import com.banco.banco_api.modules.cliente.domain.ClienteEntity;
 import java.math.BigDecimal;
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -20,23 +23,23 @@ public class CuentaEntity {
 
     @Id
     @Column(name = "numero_cuenta", nullable = false, length = 50)
-    @javax.validation.constraints.NotBlank(message = "El número de cuenta es obligatorio")
+    @NotBlank(message = "El número de cuenta es obligatorio")
     private String numeroCuenta;
 
     @Column(name = "tipo_cuenta", nullable = false, length = 20)
-    @javax.validation.constraints.NotBlank(message = "El tipo de cuenta es obligatorio")
+    @NotBlank(message = "El tipo de cuenta es obligatorio")
     private String tipoCuenta; // "Ahorro" o "Corriente"
 
     @Column(name = "saldo_inicial", nullable = false, precision = 12, scale = 2)
-    @javax.validation.constraints.NotNull(message = "El saldo inicial es obligatorio")
+    @NotNull(message = "El saldo inicial es obligatorio")
     private BigDecimal saldoInicial;
 
     @Column(nullable = false)
-    @javax.validation.constraints.NotNull(message = "El estado es obligatorio")
+    @NotNull(message = "El estado es obligatorio")
     private Boolean estado;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
-    @javax.validation.constraints.NotNull(message = "El cliente es obligatorio")
+    @NotNull(message = "El cliente es obligatorio")
     private ClienteEntity cliente;
 }
