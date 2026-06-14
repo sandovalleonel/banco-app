@@ -37,7 +37,7 @@ CREATE TABLE persona (
 -- 4. TABLA CLIENTE (Hereda de Persona mediante estrategia JOINED)
 CREATE TABLE cliente (
     cliente_id BIGINT PRIMARY KEY,
-    contraseña VARCHAR(250) NOT NULL, -- En producción usar hashes (ej. BCrypt)
+    contrasena VARCHAR(250) NOT NULL, -- En producción usar hashes (ej. BCrypt)
     estado BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT fk_cliente_persona FOREIGN KEY (cliente_id) REFERENCES persona(id) ON DELETE CASCADE
 );
@@ -77,19 +77,19 @@ CREATE TABLE movimientos (
 -- Cliente 1: Jose Lema
 INSERT INTO persona (id, identificacion, nombre, genero, edad, direccion, telefono)
 VALUES (1, '1711111111', 'Jose Lema', 'Masculino', 30, 'Otavalo sn y principal', '098254785');
-INSERT INTO cliente (cliente_id, contraseña, estado) 
+INSERT INTO cliente (cliente_id, contrasena, estado) 
 VALUES (1, '1234', TRUE);
 
 -- Cliente 2: Marianela Montalvo
 INSERT INTO persona (id, identificacion, nombre, genero, edad, direccion, telefono)
 VALUES (2, '1722222222', 'Marianela Montalvo', 'Femenino', 28, 'Amazonas y NNUU', '097548965');
-INSERT INTO cliente (cliente_id, contraseña, estado) 
+INSERT INTO cliente (cliente_id, contrasena, estado) 
 VALUES (2, '5678', TRUE);
 
 -- Cliente 3: Juan Osorio
 INSERT INTO persona (id, identificacion, nombre, genero, edad, direccion, telefono)
 VALUES (3, '1733333333', 'Juan Osorio', 'Masculino', 35, '13 junio y Equinoccial', '098874587');
-INSERT INTO cliente (cliente_id, contraseña, estado) 
+INSERT INTO cliente (cliente_id, contrasena, estado) 
 VALUES (3, '1245', TRUE);
 
 -- Ajustar secuenciador de la tabla persona para que no choque con los IDs manuales
