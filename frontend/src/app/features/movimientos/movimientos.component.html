@@ -1,0 +1,150 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Movimientos</h1>
+  </div>
+  <button class="btn btn-primary" (click)="openAddModal()">
+    Nuevo Movimiento
+  </button>
+</div>
+
+<!-- Search Panel -->
+<div class="panel">
+  <div class="search-bar-container">
+    <input 
+      type="text" 
+      class="form-control" 
+      placeholder="Buscar" 
+      [value]="searchQuery()" 
+      (input)="onSearch($event)"
+      style="max-width: 400px;"
+    >
+  </div>
+
+  <!-- Table View -->
+  <div class="table-container">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Fecha y Hora</th>
+          <th>Número de Cuenta</th>
+          <th>Cliente</th>
+          <th>Tipo Movimiento</th>
+          <th>Valor</th>
+          <th>Saldo Disponible</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (mov of filteredMovimientos(); track mov.id) {
+          <tr>
+            <td>{{ mov.fecha | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+            <td>N° {{ mov.numeroCuenta }}</td>
+            <td>{{ getOwnerName(mov.numeroCuenta) }}</td>
+            <td>
+              <span class="badge" [ngClass]="mov.valor >= 0 ? 'badge-success' : 'badge-danger'">
+                {{ mov.tipoMovimiento }}
+              </span>
+            </td>
+            <td>
+              <strong [style.color]="mov.valor >= 0 ? 'var(--success)' : 'var(--error)'">
+                {{ mov.valor >= 0 ? '+' : '' }}{{ mov.valor | currency:'USD':'symbol':'1.2-2' }}
+              </strong>
+            </td>
+            <td>{{ mov.saldoResultante | currency:'USD':'symbol':'1.2-2' }}</td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 32px 0;">
+              No se han registrado movimientos.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Modal -->
+@if (isModalOpen) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Registrar Movimiento</h2>
+        <button class="modal-close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      
+      <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <!-- Backend/Business Rule Error Alert -->
+          @if (backendErrorMsg) {
+            <div class="business-error-alert">
+              <span><strong>Error:</strong> {{ backendErrorMsg }}</span>
+            </div>
+          }
+
+          <div class="form-group">
+            <label class="form-label">Cuenta</label>
+            <select 
+              class="form-control" 
+              formControlName="numeroCuenta"
+              [class.is-invalid]="isSubmitted && transactionForm.get('numeroCuenta')?.invalid"
+            >
+              <option value="" disabled selected>Seleccione la cuenta...</option>
+              @for (cuenta of cuentas(); track cuenta.numeroCuenta) {
+                <option [value]="cuenta.numeroCuenta">
+                  N° {{ cuenta.numeroCuenta }} - {{ getOwnerName(cuenta.numeroCuenta) }} ({{ cuenta.tipoCuenta }})
+                </option>
+              }
+            </select>
+            @if (isSubmitted && transactionForm.get('numeroCuenta')?.invalid) {
+              <div class="invalid-feedback">
+                Debe seleccionar una cuenta.
+              </div>
+            }
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Tipo Movimiento</label>
+              <select 
+                class="form-control" 
+                formControlName="tipoMovimiento"
+                [class.is-invalid]="isSubmitted && transactionForm.get('tipoMovimiento')?.invalid"
+              >
+                <option value="" disabled selected>Seleccione...</option>
+                <option value="Deposito">Depósito</option>
+                <option value="Retiro">Retiro</option>
+              </select>
+              @if (isSubmitted && transactionForm.get('tipoMovimiento')?.invalid) {
+                <div class="invalid-feedback">
+                  El tipo de movimiento es requerido.
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Valor</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                formControlName="valor" 
+                placeholder="Valor"
+                step="0.01"
+                [class.is-invalid]="isSubmitted && transactionForm.get('valor')?.invalid"
+              >
+              @if (isSubmitted && transactionForm.get('valor')?.invalid) {
+                <div class="invalid-feedback">
+                  Ingrese un monto válido (mínimo 0.01).
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Registrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

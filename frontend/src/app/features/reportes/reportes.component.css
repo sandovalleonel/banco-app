@@ -1,0 +1,75 @@
+/* Reportes basic dashboard styles */
+.metrics-grid {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.metric-card {
+  flex: 1;
+  min-width: 200px;
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metric-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.metric-value {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.metric-value.success {
+  color: var(--success);
+}
+
+.metric-value.error {
+  color: var(--error);
+}
+
+.empty-report-state {
+  padding: 40px;
+  text-align: center;
+  border: 1px dashed var(--border-color);
+  color: var(--text-secondary);
+  border-radius: 4px;
+}
+
+.empty-report-state h3 {
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.empty-report-state p {
+  font-size: 14px;
+}
+
+.print-header {
+  display: none;
+}
+
+@media print {
+  .print-header {
+    display: block !important;
+  }
+  .metrics-grid {
+    border: 1px solid #000000;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+  .metric-card {
+    border: none !important;
+  }
+}

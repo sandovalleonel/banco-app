@@ -3,6 +3,7 @@ package com.banco.banco_api.modules.cuenta.web;
 import com.banco.banco_api.modules.cuenta.dto.CuentaDto;
 import com.banco.banco_api.modules.cuenta.service.CuentaService;
 import com.banco.banco_api.modules.shared.dto.GeneralResponseDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/cuentas")
 @CrossOrigin(origins = "*")
+@Slf4j
 public class CuentaController {
 
     private final CuentaService cuentaService;
@@ -25,56 +27,66 @@ public class CuentaController {
 
     @GetMapping
     public ResponseEntity<GeneralResponseDto<List<CuentaDto>>> getAllAccounts() {
+        log.info("Request: Get all accounts");
         List<CuentaDto> accounts = cuentaService.getAllAccounts();
         GeneralResponseDto<List<CuentaDto>> response = GeneralResponseDto.<List<CuentaDto>>builder()
                 .success(true)
                 .message("Cuentas recuperadas exitosamente")
                 .data(accounts)
                 .build();
+        log.info("Response: Get all accounts -> {}", response);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{numeroCuenta}")
     public ResponseEntity<GeneralResponseDto<CuentaDto>> getAccountByNumber(@PathVariable String numeroCuenta) {
+        log.info("Request: Get account by number: {}", numeroCuenta);
         CuentaDto account = cuentaService.getAccountByNumber(numeroCuenta);
         GeneralResponseDto<CuentaDto> response = GeneralResponseDto.<CuentaDto>builder()
                 .success(true)
                 .message("Cuenta recuperada exitosamente")
                 .data(account)
                 .build();
+        log.info("Response: Get account by number: {} -> {}", numeroCuenta, response);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
     public ResponseEntity<GeneralResponseDto<CuentaDto>> createAccount(@Valid @RequestBody CuentaDto accountDto) {
+        log.info("Request: Create account -> {}", accountDto);
         CuentaDto created = cuentaService.createAccount(accountDto);
         GeneralResponseDto<CuentaDto> response = GeneralResponseDto.<CuentaDto>builder()
                 .success(true)
                 .message("Cuenta creada exitosamente")
                 .data(created)
                 .build();
+        log.info("Response: Create account -> {}", response);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{numeroCuenta}")
     public ResponseEntity<GeneralResponseDto<CuentaDto>> updateAccount(@PathVariable String numeroCuenta, @Valid @RequestBody CuentaDto accountDto) {
+        log.info("Request: Update account: {} -> {}", numeroCuenta, accountDto);
         CuentaDto updated = cuentaService.updateAccount(numeroCuenta, accountDto);
         GeneralResponseDto<CuentaDto> response = GeneralResponseDto.<CuentaDto>builder()
                 .success(true)
                 .message("Cuenta actualizada exitosamente")
                 .data(updated)
                 .build();
+        log.info("Response: Update account: {} -> {}", numeroCuenta, response);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{numeroCuenta}")
     public ResponseEntity<GeneralResponseDto<Void>> deleteAccount(@PathVariable String numeroCuenta) {
+        log.info("Request: Delete account: {}", numeroCuenta);
         cuentaService.deleteAccount(numeroCuenta);
         GeneralResponseDto<Void> response = GeneralResponseDto.<Void>builder()
                 .success(true)
                 .message("Cuenta eliminada exitosamente")
                 .data(null)
                 .build();
+        log.info("Response: Delete account: {} -> {}", numeroCuenta, response);
         return ResponseEntity.ok(response);
     }
 }

@@ -1,0 +1,225 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Clientes</h1>
+  </div>
+  <button class="btn btn-primary" (click)="openAddModal()">
+    Nuevo Cliente
+  </button>
+</div>
+
+<!-- Search Panel -->
+<div class="panel">
+  <div class="search-bar-container">
+    <input 
+      type="text" 
+      class="form-control" 
+      placeholder="Buscar" 
+      [value]="searchQuery()" 
+      (input)="onSearch($event)"
+      style="max-width: 400px;"
+    >
+  </div>
+
+  <!-- Table View -->
+  <div class="table-container">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Identificación</th>
+          <th>Nombre</th>
+          <th>Edad</th>
+          <th>Género</th>
+          <th>Teléfono</th>
+          <th>Dirección</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cliente of filteredClientes(); track cliente.id) {
+          <tr>
+            <td>{{ cliente.id }}</td>
+            <td>{{ cliente.identificacion }}</td>
+            <td>{{ cliente.nombre }}</td>
+            <td>{{ cliente.edad }}</td>
+            <td>{{ cliente.genero }}</td>
+            <td>{{ cliente.telefono }}</td>
+            <td>{{ cliente.direccion }}</td>
+            <td>
+              <span class="badge" [ngClass]="cliente.estado ? 'badge-success' : 'badge-danger'">
+                {{ cliente.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-secondary btn-sm" (click)="openEditModal(cliente)">
+                  Editar
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="deleteCliente(cliente.id!)">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="9" style="text-align: center; color: var(--text-secondary); padding: 32px 0;">
+              No se encontraron clientes registrados.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+@if (isModalOpen) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">{{ isEditMode ? 'Editar Cliente' : 'Registrar Nuevo Cliente' }}</h2>
+        <button class="modal-close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      
+      <form [formGroup]="clientForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Nombre Completo</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="nombre" 
+              placeholder="Nombre"
+              [class.is-invalid]="isSubmitted && clientForm.get('nombre')?.invalid"
+            >
+            @if (isSubmitted && clientForm.get('nombre')?.invalid) {
+              <div class="invalid-feedback">
+                El nombre es requerido (mínimo 3 caracteres).
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Identificación</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="identificacion" 
+              placeholder="Identificación"
+              [class.is-invalid]="isSubmitted && clientForm.get('identificacion')?.invalid"
+            >
+            @if (isSubmitted && clientForm.get('identificacion')?.invalid) {
+              <div class="invalid-feedback">
+                La identificación es requerida (5 a 20 caracteres).
+              </div>
+            }
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Género</label>
+              <select 
+                class="form-control" 
+                formControlName="genero"
+                [class.is-invalid]="isSubmitted && clientForm.get('genero')?.invalid"
+              >
+                <option value="" disabled selected>Seleccione...</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+              @if (isSubmitted && clientForm.get('genero')?.invalid) {
+                <div class="invalid-feedback">
+                  El género es requerido.
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Edad</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                formControlName="edad" 
+                placeholder="Edad"
+                [class.is-invalid]="isSubmitted && clientForm.get('edad')?.invalid"
+              >
+              @if (isSubmitted && clientForm.get('edad')?.invalid) {
+                <div class="invalid-feedback">
+                  Edad requerida (1 a 120).
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Dirección</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="direccion" 
+              placeholder="Dirección"
+              [class.is-invalid]="isSubmitted && clientForm.get('direccion')?.invalid"
+            >
+            @if (isSubmitted && clientForm.get('direccion')?.invalid) {
+              <div class="invalid-feedback">
+                La dirección es requerida.
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Teléfono</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="telefono" 
+              placeholder="Teléfono"
+              [class.is-invalid]="isSubmitted && clientForm.get('telefono')?.invalid"
+            >
+            @if (isSubmitted && clientForm.get('telefono')?.invalid) {
+              <div class="invalid-feedback">
+                El teléfono es requerido.
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <input 
+              type="password" 
+              class="form-control" 
+              formControlName="contrasena" 
+              placeholder="Contraseña"
+              [class.is-invalid]="isSubmitted && clientForm.get('contrasena')?.invalid"
+            >
+            @if (isSubmitted && clientForm.get('contrasena')?.invalid) {
+              <div class="invalid-feedback">
+                Contraseña requerida (mínimo 4 caracteres).
+              </div>
+            }
+          </div>
+
+          <div class="form-group" style="flex-direction: row; align-items: center; gap: 10px; margin-top: 8px;">
+            <input 
+              type="checkbox" 
+              id="estadoCheckbox" 
+              formControlName="estado" 
+              style="width: 16px; height: 16px; cursor: pointer;"
+            >
+            <label for="estadoCheckbox" style="cursor: pointer; font-size: 14px;">Activo</label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            {{ isEditMode ? 'Guardar' : 'Registrar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

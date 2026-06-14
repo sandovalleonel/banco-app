@@ -1,0 +1,177 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Cuentas</h1>
+  </div>
+  <button class="btn btn-primary" (click)="openAddModal()">
+    Nueva Cuenta
+  </button>
+</div>
+
+<!-- Search Panel -->
+<div class="panel">
+  <div class="search-bar-container">
+    <input 
+      type="text" 
+      class="form-control" 
+      placeholder="Buscar" 
+      [value]="searchQuery()" 
+      (input)="onSearch($event)"
+      style="max-width: 400px;"
+    >
+  </div>
+
+  <!-- Table View -->
+  <div class="table-container">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Número de Cuenta</th>
+          <th>Tipo</th>
+          <th>Saldo Inicial</th>
+          <th>Cliente Propietario</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (cuenta of filteredCuentas(); track cuenta.numeroCuenta) {
+          <tr>
+            <td>N° {{ cuenta.numeroCuenta }}</td>
+            <td>
+              <span class="badge" [ngClass]="cuenta.tipoCuenta === 'Ahorro' || cuenta.tipoCuenta === 'Ahorros' ? 'badge-info' : 'badge-success'">
+                {{ cuenta.tipoCuenta }}
+              </span>
+            </td>
+            <td>{{ cuenta.saldoInicial | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ getClienteNombre(cuenta.clienteId) }}</td>
+            <td>
+              <span class="badge" [ngClass]="cuenta.estado ? 'badge-success' : 'badge-danger'">
+                {{ cuenta.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+            </td>
+            <td>
+              <div class="actions-cell">
+                <button class="btn btn-secondary btn-sm" (click)="openEditModal(cuenta)">
+                  Editar
+                </button>
+                <button class="btn btn-danger btn-sm" (click)="deleteCuenta(cuenta.numeroCuenta)">
+                  Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 32px 0;">
+              No se encontraron cuentas bancarias registradas.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+@if (isModalOpen) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">{{ isEditMode ? 'Editar Cuenta' : 'Registrar Nueva Cuenta' }}</h2>
+        <button class="modal-close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      
+      <form [formGroup]="accountForm" (ngSubmit)="onSubmit()">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Número de Cuenta</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              formControlName="numeroCuenta" 
+              placeholder="Número de Cuenta"
+              [class.is-invalid]="isSubmitted && accountForm.get('numeroCuenta')?.invalid"
+            >
+            @if (isSubmitted && accountForm.get('numeroCuenta')?.invalid) {
+              <div class="invalid-feedback">
+                Número de cuenta es requerido (sólo dígitos, 4 a 12 caracteres).
+              </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Cliente</label>
+            <select 
+              class="form-control" 
+              formControlName="clienteId"
+              [class.is-invalid]="isSubmitted && accountForm.get('clienteId')?.invalid"
+            >
+              <option value="" disabled selected>Seleccione el cliente...</option>
+              @for (cliente of clientes(); track cliente.id) {
+                <option [value]="cliente.id">{{ cliente.nombre }} ({{ cliente.identificacion }})</option>
+              }
+            </select>
+            @if (isSubmitted && accountForm.get('clienteId')?.invalid) {
+              <div class="invalid-feedback">
+                Debe asociar la cuenta a un cliente.
+              </div>
+            }
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label class="form-label">Tipo</label>
+              <select 
+                class="form-control" 
+                formControlName="tipoCuenta"
+                [class.is-invalid]="isSubmitted && accountForm.get('tipoCuenta')?.invalid"
+              >
+                <option value="" disabled selected>Seleccione...</option>
+                <option value="Ahorro">Ahorro</option>
+                <option value="Corriente">Corriente</option>
+              </select>
+              @if (isSubmitted && accountForm.get('tipoCuenta')?.invalid) {
+                <div class="invalid-feedback">
+                  El tipo de cuenta es requerido.
+                </div>
+              }
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Saldo Inicial</label>
+              <input 
+                type="number" 
+                class="form-control" 
+                formControlName="saldoInicial" 
+                placeholder="Saldo Inicial"
+                [class.is-invalid]="isSubmitted && accountForm.get('saldoInicial')?.invalid"
+              >
+              @if (isSubmitted && accountForm.get('saldoInicial')?.invalid) {
+                <div class="invalid-feedback">
+                  Saldo inicial requerido (mínimo 0).
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-group" style="flex-direction: row; align-items: center; gap: 10px; margin-top: 8px;">
+            <input 
+              type="checkbox" 
+              id="estadoCuentaCheckbox" 
+              formControlName="estado" 
+              style="width: 16px; height: 16px; cursor: pointer;"
+            >
+            <label for="estadoCuentaCheckbox" style="cursor: pointer; font-size: 14px;">Activa</label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">
+            {{ isEditMode ? 'Guardar' : 'Registrar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,25 @@
+/* Cuentas component specific styles */
+.table-custom th:nth-child(1),
+.table-custom td:nth-child(1) {
+  width: 180px;
+}
+
+.table-custom th:nth-child(2),
+.table-custom td:nth-child(2) {
+  width: 120px;
+}
+
+.table-custom th:nth-child(3),
+.table-custom td:nth-child(3) {
+  width: 140px;
+}
+
+.table-custom th:nth-child(5),
+.table-custom td:nth-child(5) {
+  width: 100px;
+}
+
+.table-custom th:nth-child(6),
+.table-custom td:nth-child(6) {
+  width: 160px;
+}

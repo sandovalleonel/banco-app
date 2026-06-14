@@ -4,6 +4,7 @@
 -- =============================================================================
 
 -- 1. ELIMINACIÓN DE TABLAS EN ORDEN DE JERARQUÍA (Por si se vuelve a ejecutar)
+DROP TABLE IF EXISTS movimientos_historico CASCADE;
 DROP TABLE IF EXISTS movimientos CASCADE;
 DROP TABLE IF EXISTS cuenta CASCADE;
 DROP TABLE IF EXISTS cliente CASCADE;
@@ -66,6 +67,70 @@ CREATE TABLE movimientos (
 );
 
 
+-- 7. TABLA DE AUDITORÍA / HISTÓRICO
+CREATE TABLE movimientos_historico (
+    historico_id BIGSERIAL PRIMARY KEY,
+    movimiento_id BIGINT,
+    fecha_movimiento TIMESTAMP,
+    tipo_movimiento VARCHAR(20),
+    valor NUMERIC(12, 2),
+    saldo NUMERIC(12, 2),
+    numero_cuenta VARCHAR(20),
+    -- Campos de auditoría
+    auditoria_operacion VARCHAR(10) NOT NULL, -- INSERT, UPDATE, DELETE
+    auditoria_fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    auditoria_usuario VARCHAR(100) NOT NULL
+);
+
+
+-- 8. FUNCIÓN Y TRIGGER DE AUDITORÍA (Corregido con ELSIF)
+CREATE OR REPLACE FUNCTION fn_auditar_movimientos()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        INSERT INTO movimientos_historico (
+            movimiento_id, fecha_movimiento, tipo_movimiento, valor, saldo, numero_cuenta, 
+            auditoria_operacion, auditoria_usuario
+        )
+        VALUES (
+            NEW.id, NEW.fecha, NEW.tipo_movimiento, NEW.valor, NEW.saldo, NEW.numero_cuenta, 
+            'INSERT', CURRENT_USER
+        );
+        RETURN NEW;
+        
+    ELSIF (TG_OP = 'UPDATE') THEN
+        INSERT INTO movimientos_historico (
+            movimiento_id, fecha_movimiento, tipo_movimiento, valor, saldo, numero_cuenta, 
+            auditoria_operacion, auditoria_usuario
+        )
+        VALUES (
+            NEW.id, NEW.fecha, NEW.tipo_movimiento, NEW.valor, NEW.saldo, NEW.numero_cuenta, 
+            'UPDATE', CURRENT_USER
+        );
+        RETURN NEW;
+        
+    ELSIF (TG_OP = 'DELETE') THEN
+        INSERT INTO movimientos_historico (
+            movimiento_id, fecha_movimiento, tipo_movimiento, valor, saldo, numero_cuenta, 
+            auditoria_operacion, auditoria_usuario
+        )
+        VALUES (
+            OLD.id, OLD.fecha, OLD.tipo_movimiento, OLD.valor, OLD.saldo, OLD.numero_cuenta, 
+            'DELETE', CURRENT_USER
+        );
+        RETURN OLD;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger asociado a la tabla movimientos
+CREATE TRIGGER trg_auditoria_movimientos
+AFTER INSERT OR UPDATE OR DELETE ON movimientos
+FOR EACH ROW
+EXECUTE FUNCTION fn_auditar_movimientos();
+
+
 -- =============================================================================
 -- INSERCIÓN DE DATOS DE PRUEBA (Casos de Uso de las Capturas)
 -- =============================================================================
@@ -104,7 +169,7 @@ SELECT setval('persona_id_seq', (SELECT MAX(id) FROM persona));
 INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, estado, cliente_id)
 VALUES ('478758', 'Ahorro', 2000.00, TRUE, 1);
 
--- Cuenta Corriente de Marianela Montalvo (Saldo Inicial: 1000)
+-- Cuenta Corriente de Marianela Montalvo (Saldo Inicial: 100)
 INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, estado, cliente_id)
 VALUES ('225487', 'Corriente', 100.00, TRUE, 2);
 

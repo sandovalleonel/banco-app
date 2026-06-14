@@ -58,6 +58,10 @@ public class CuentaServiceImpl implements CuentaService {
         ClienteEntity cliente = clienteRepository.findById(accountDto.getClienteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con el ID: " + accountDto.getClienteId()));
 
+        if (Boolean.FALSE.equals(cliente.getEstado())) {
+            throw new BusinessRuleException("El cliente está inactivo y no se pueden realizar operaciones de creación o edición.");
+        }
+
         CuentaEntity entity = CuentaEntity.builder()
                 .numeroCuenta(accountDto.getNumeroCuenta())
                 .tipoCuenta(accountDto.getTipoCuenta())
@@ -75,8 +79,16 @@ public class CuentaServiceImpl implements CuentaService {
         CuentaEntity existing = cuentaRepository.findById(accountNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Cuenta no encontrada con el número: " + accountNumber));
 
+        if (existing.getCliente() != null && !existing.getCliente().getId().equals(accountDto.getClienteId())) {
+            throw new BusinessRuleException("No se puede modificar el cliente de una cuenta.");
+        }
+
         ClienteEntity cliente = clienteRepository.findById(accountDto.getClienteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con el ID: " + accountDto.getClienteId()));
+
+        if (Boolean.FALSE.equals(cliente.getEstado())) {
+            throw new BusinessRuleException("El cliente está inactivo y no se pueden realizar operaciones de creación o edición.");
+        }
 
         existing.setTipoCuenta(accountDto.getTipoCuenta());
         existing.setSaldoInicial(accountDto.getSaldoInicial());

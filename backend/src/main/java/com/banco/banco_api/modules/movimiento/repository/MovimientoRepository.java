@@ -1,6 +1,7 @@
 package com.banco.banco_api.modules.movimiento.repository;
 
 import com.banco.banco_api.modules.movimiento.domain.MovimientoEntity;
+import com.banco.banco_api.modules.shared.constants.Constants;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,7 +18,7 @@ public interface MovimientoRepository extends JpaRepository<MovimientoEntity, Lo
 
     @Query("SELECT COALESCE(SUM(m.valor), 0) FROM MovimientoEntity m " +
            "WHERE m.cuenta.cliente.id = :clienteId " +
-           "AND m.tipoMovimiento = 'Débito' " +
+           "AND m.tipoMovimiento = '" + Constants.TIPO_DEBITO + "' " +
            "AND m.fecha BETWEEN :startOfDay AND :endOfDay")
     BigDecimal sumDebitsByClienteAndDateRange(
             @Param("clienteId") Long clienteId,

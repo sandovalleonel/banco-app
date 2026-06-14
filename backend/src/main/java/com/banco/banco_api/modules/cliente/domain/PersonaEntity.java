@@ -25,7 +25,8 @@ public class PersonaEntity {
 
     @Column(nullable = false, unique = true)
     @javax.validation.constraints.NotBlank(message = "La identificación es obligatoria")
-    @javax.validation.constraints.Size(min = 5, max = 20, message = "La identificación debe tener entre 5 y 20 caracteres")
+    @javax.validation.constraints.Size(min = 5, max = 10, message = "La identificación debe tener entre 5 y 10 caracteres")
+    @javax.validation.constraints.Pattern(  regexp = "^\\S+$",  message = "La identificación no puede contener espacios en blanco en ningún lado")
     private String identificacion;
 
     @Column(nullable = false)
