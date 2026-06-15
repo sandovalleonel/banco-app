@@ -5,7 +5,7 @@ COPY pom.xml .
 # Descargar dependencias para cachear capas de Docker
 RUN mvn dependency:go-offline -B
 COPY src ./src
-RUN mvn clean package -DskipTests -B
+RUN mvn clean package  -B
 
 # Etapa de Ejecución
 FROM eclipse-temurin:8-jre
