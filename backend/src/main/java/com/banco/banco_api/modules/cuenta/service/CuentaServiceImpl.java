@@ -112,6 +112,17 @@ public class CuentaServiceImpl implements CuentaService {
         cuentaRepository.delete(existing);
     }
 
+    @Override
+    public void deactivateAccountsByClientId(Long clientId) {
+        List<CuentaEntity> cuentas = cuentaRepository.findByClienteId(clientId);
+        for (CuentaEntity cuenta : cuentas) {
+            if (Boolean.TRUE.equals(cuenta.getEstado())) {
+                cuenta.setEstado(false);
+                cuentaRepository.save(cuenta);
+            }
+        }
+    }
+
     private CuentaDto toDto(CuentaEntity entity) {
         if (entity == null) return null;
         return CuentaDto.builder()

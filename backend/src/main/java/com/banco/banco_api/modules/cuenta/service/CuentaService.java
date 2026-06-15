@@ -9,4 +9,5 @@ public interface CuentaService {
     CuentaDto createAccount(CuentaDto accountDto);
     CuentaDto updateAccount(String accountNumber, CuentaDto accountDto);
     void deleteAccount(String accountNumber);
+    void deactivateAccountsByClientId(Long clientId);
 }

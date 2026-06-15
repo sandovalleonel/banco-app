@@ -26,14 +26,17 @@ public class ReporteServiceImpl implements ReporteService {
     private final ClienteRepository clienteRepository;
     private final CuentaRepository cuentaRepository;
     private final MovimientoRepository movimientoRepository;
+    private final ReportePdfService reportePdfService;
 
     @Autowired
     public ReporteServiceImpl(ClienteRepository clienteRepository,
                               CuentaRepository cuentaRepository,
-                              MovimientoRepository movimientoRepository) {
+                              MovimientoRepository movimientoRepository,
+                              ReportePdfService reportePdfService) {
         this.clienteRepository = clienteRepository;
         this.cuentaRepository = cuentaRepository;
         this.movimientoRepository = movimientoRepository;
+        this.reportePdfService = reportePdfService;
     }
 
     @Override
@@ -56,24 +59,36 @@ public class ReporteServiceImpl implements ReporteService {
         Map<String, Object> report = new HashMap<>();
         report.put("cliente", cliente.getNombre());
         report.put("identificacion", cliente.getIdentificacion());
-        report.put("cuentas", cuentas.stream().map(c -> {
+
+        // Restructure cuentas: nest matching movements
+        List<Map<String, Object>> cuentasList = cuentas.stream().map(c -> {
             Map<String, Object> cMap = new HashMap<>();
             cMap.put("numeroCuenta", c.getNumeroCuenta());
             cMap.put("tipoCuenta", c.getTipoCuenta());
             cMap.put("saldoActual", c.getSaldoInicial());
             cMap.put("estado", c.getEstado());
+
+            // Filter movements belonging to this account
+            List<Map<String, Object>> accountMovements = movimientos.stream()
+                .filter(m -> m.getCuenta().getNumeroCuenta().equals(c.getNumeroCuenta()))
+                .map(m -> {
+                    Map<String, Object> mMap = new HashMap<>();
+                    mMap.put("fecha", m.getFecha());
+                    mMap.put("tipoMovimiento", m.getTipoMovimiento());
+                    mMap.put("valor", m.getValor());
+                    mMap.put("saldoResultante", m.getSaldo());
+                    return mMap;
+                }).collect(Collectors.toList());
+
+            cMap.put("movimientos", accountMovements);
             return cMap;
-        }).collect(Collectors.toList()));
-        
-        report.put("movimientos", movimientos.stream().map(m -> {
-            Map<String, Object> mMap = new HashMap<>();
-            mMap.put("fecha", m.getFecha());
-            mMap.put("numeroCuenta", m.getCuenta().getNumeroCuenta());
-            mMap.put("tipoMovimiento", m.getTipoMovimiento());
-            mMap.put("valor", m.getValor());
-            mMap.put("saldoResultante", m.getSaldo());
-            return mMap;
-        }).collect(Collectors.toList()));
+        }).collect(Collectors.toList());
+
+        report.put("cuentas", cuentasList);
+
+        // Generate PDF and encode to Base64 using injected ReportePdfService
+        String pdfBase64 = reportePdfService.generatePdfBase64(cliente, cuentas, movimientos, startDate, endDate);
+        report.put("pdfBase64", pdfBase64);
 
         return report;
     }

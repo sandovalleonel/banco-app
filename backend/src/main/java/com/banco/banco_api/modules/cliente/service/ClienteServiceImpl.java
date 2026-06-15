@@ -5,6 +5,7 @@ import com.banco.banco_api.modules.cliente.dto.ClienteDto;
 import com.banco.banco_api.modules.cliente.repository.ClienteRepository;
 import com.banco.banco_api.modules.cuenta.domain.CuentaEntity;
 import com.banco.banco_api.modules.cuenta.repository.CuentaRepository;
+import com.banco.banco_api.modules.cuenta.service.CuentaService;
 import com.banco.banco_api.modules.shared.exception.BusinessRuleException;
 import com.banco.banco_api.modules.shared.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,15 @@ public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final CuentaRepository cuentaRepository;
+    private final CuentaService cuentaService;
 
     @Autowired
-    public ClienteServiceImpl(ClienteRepository clienteRepository, CuentaRepository cuentaRepository) {
+    public ClienteServiceImpl(ClienteRepository clienteRepository,
+                              CuentaRepository cuentaRepository,
+                              CuentaService cuentaService) {
         this.clienteRepository = clienteRepository;
         this.cuentaRepository = cuentaRepository;
+        this.cuentaService = cuentaService;
     }
 
     @Override
@@ -66,6 +71,10 @@ public class ClienteServiceImpl implements ClienteService {
         existing.setTelefono(clientDto.getTelefono());
         existing.setContrasena(clientDto.getContrasena());
         existing.setEstado(clientDto.getEstado());
+
+        if (Boolean.FALSE.equals(clientDto.getEstado())) {
+            cuentaService.deactivateAccountsByClientId(id);
+        }
 
         ClienteEntity saved = clienteRepository.save(existing);
         return toDto(saved);
