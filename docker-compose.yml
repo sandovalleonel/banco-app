@@ -32,6 +32,8 @@ services:
     depends_on:
       banco-db:
         condition: service_healthy
+    volumes:
+      - ./backend/target/surefire-reports:/app/target/surefire-reports
     environment:
       DB_HOST: banco-db
       DB_PORT: 5432
