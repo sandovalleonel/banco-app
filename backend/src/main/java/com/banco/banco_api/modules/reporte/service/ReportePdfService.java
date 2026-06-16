@@ -142,7 +142,11 @@ public class ReportePdfService {
                             String fechaStr = m.getFecha().format(dtf);
                             PdfPCell d1 = new PdfPCell(new Paragraph(fechaStr, textFont));
                             PdfPCell d2 = new PdfPCell(new Paragraph(m.getTipoMovimiento(), textFont));
-                            PdfPCell d3 = new PdfPCell(new Paragraph("$" + m.getValor().toString(), textFont));
+                            String valorFormateado = m.getValor().doubleValue() < 0
+                                    ? "- $" + Math.abs(m.getValor().doubleValue())
+                                    : "$" + m.getValor().toString();
+
+                            PdfPCell d3 = new PdfPCell(new Paragraph(valorFormateado, textFont));
                             PdfPCell d4 = new PdfPCell(new Paragraph("$" + m.getSaldo().toString(), textFont));
 
                             for (PdfPCell cell : new PdfPCell[]{d1, d2, d3, d4}) {

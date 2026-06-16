@@ -24,12 +24,12 @@ export class ReportesComponent implements OnInit {
 
   // Report results state
   reportData = signal<any | null>(null);
-  
+
   // Method to get current date for template
   newDate(): Date {
     return new Date();
   }
-  
+
   // Aggregate Metrics
   totalDepositos = signal<number>(0);
   totalRetiros = signal<number>(0);
@@ -59,7 +59,7 @@ export class ReportesComponent implements OnInit {
     }, { validators: this.dateRangeValidator });
   }
 
-  dateRangeValidator = (group: FormGroup): {[key: string]: any} | null => {
+  dateRangeValidator = (group: FormGroup): { [key: string]: any } | null => {
     const inicio = group.get('fechaInicio')?.value;
     const fin = group.get('fechaFin')?.value;
     if (inicio && fin && new Date(inicio) > new Date(fin)) {
@@ -166,7 +166,7 @@ export class ReportesComponent implements OnInit {
       const linkSource = `data:application/pdf;base64,${base64Pdf}`;
       const downloadLink = document.createElement('a');
       const fileName = `Estado_Cuenta_${(data.cliente || 'Reporte').replace(/\s+/g, '_')}_${this.filterForm.value.fechaInicio}_a_${this.filterForm.value.fechaFin}.pdf`;
-      
+
       downloadLink.href = linkSource;
       downloadLink.download = fileName;
       downloadLink.click();
@@ -174,4 +174,6 @@ export class ReportesComponent implements OnInit {
       alert('Error al descargar el PDF: ' + (e as Error).message);
     }
   }
+
+  evaluarAbsoluto(valor: number) { return Math.abs(valor); }
 }
