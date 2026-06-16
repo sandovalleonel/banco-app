@@ -157,4 +157,20 @@ export class MovimientosComponent implements OnInit {
       }
     });
   }
+
+  onDelete(id: number): void {
+    if (confirm('¿Está seguro de que desea eliminar este movimiento?')) {
+      this.movimientoService.delete(id).subscribe({
+        next: (res) => {
+          if (res.success) {
+            alert('Movimiento eliminado con éxito');
+            this.loadData();
+          }
+        },
+        error: (err) => {
+          alert('Error al eliminar movimiento: ' + err.message);
+        }
+      });
+    }
+  }
 }

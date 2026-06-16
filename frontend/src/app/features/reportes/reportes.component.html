@@ -10,9 +10,9 @@
 </div>
 
 <!-- Filters Panel -->
-<div class="panel hide-on-print" style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px;">
-  <form [formGroup]="filterForm" (ngSubmit)="generarReporte()" style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;">
-    <div class="form-group" style="margin-bottom: 0; min-width: 200px;">
+<div class="panel hide-on-print filter-card">
+  <form [formGroup]="filterForm" (ngSubmit)="generarReporte()" class="filters-form">
+    <div class="form-group cliente-select-group">
       <label class="form-label">Cliente</label>
       <select 
         class="form-control" 
@@ -26,122 +26,141 @@
       </select>
     </div>
 
-    <div class="form-group" style="margin-bottom: 0;">
+    <div class="form-group date-group">
       <label class="form-label">Fecha Inicio</label>
       <input 
         type="date" 
         class="form-control" 
         formControlName="fechaInicio"
-        [class.is-invalid]="isSubmitted && filterForm.get('fechaInicio')?.invalid"
+        [max]="filterForm.get('fechaFin')?.value"
+        [class.is-invalid]="isSubmitted && (filterForm.get('fechaInicio')?.invalid || filterForm.hasError('rangeInvalid'))"
       >
     </div>
 
-    <div class="form-group" style="margin-bottom: 0;">
+    <div class="form-group date-group">
       <label class="form-label">Fecha Fin</label>
       <input 
         type="date" 
         class="form-control" 
         formControlName="fechaFin"
-        [class.is-invalid]="isSubmitted && filterForm.get('fechaFin')?.invalid"
+        [min]="filterForm.get('fechaInicio')?.value"
+        [class.is-invalid]="isSubmitted && (filterForm.get('fechaFin')?.invalid || filterForm.hasError('rangeInvalid'))"
       >
     </div>
 
-    <button type="submit" class="btn btn-primary">
-      Generar Reporte
-    </button>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        Generar Reporte
+      </button>
+    </div>
   </form>
+  
   @if (isSubmitted && filterForm.invalid) {
-    <div class="invalid-feedback" style="margin-top: 10px;">
-      Debe seleccionar un cliente y especificar las fechas.
+    <div class="invalid-feedback-container">
+      @if (filterForm.get('clienteId')?.invalid) {
+        <div>• Debe seleccionar un cliente.</div>
+      }
+      @if (filterForm.get('fechaInicio')?.invalid || filterForm.get('fechaFin')?.invalid) {
+        <div>• Las fechas de inicio y fin son requeridas.</div>
+      }
+      @if (filterForm.hasError('rangeInvalid')) {
+        <div>• La fecha de inicio no puede ser posterior a la fecha de fin.</div>
+      }
     </div>
   }
 </div>
 
 <!-- Report Output Container -->
 @if (reportData()) {
-  <!-- Print Header -->
-  <div class="print-header">
-    <div style="border-bottom: 2px solid #000000; padding-bottom: 10px; margin-bottom: 20px;">
-      <h2 style="font-size: 20px; font-weight: bold;">BANCO - ESTADO DE CUENTA</h2>
-      <p style="font-size: 14px; margin-top: 5px; color: #4b5563;">
-        <strong>Cliente:</strong> {{ reportData().cliente }} &nbsp;|&nbsp; 
-        <strong>Rango:</strong> {{ filterForm.value.fechaInicio | date:'dd/MM/yyyy' }} al {{ filterForm.value.fechaFin | date:'dd/MM/yyyy' }} &nbsp;|&nbsp; 
-        <strong>Generado:</strong> {{ newDate() | date:'dd/MM/yyyy HH:mm:ss' }}
-      </p>
+  <!-- Client Profile Information -->
+  <div class="client-info-container">
+    <h2>Estado de Cuenta</h2>
+    <div class="client-details">
+      <p><strong>Cliente:</strong> {{ reportData().cliente }}</p>
+      <p><strong>Identificación:</strong> {{ reportData().identificacion }}</p>
+      <p><strong>Periodo:</strong> {{ filterForm.value.fechaInicio | date:'dd/MM/yyyy' }} al {{ filterForm.value.fechaFin | date:'dd/MM/yyyy' }}</p>
     </div>
   </div>
 
-  <!-- Summary Cards -->
+  <!-- Summary Aggregate Metrics Cards -->
   <div class="metrics-grid">
     <div class="metric-card">
-      <span class="metric-title">Total Créditos</span>
-      <span class="metric-value success">{{ totalDepositos() | currency:'USD':'symbol':'1.2-2' }}</span>
+      <span class="metric-label">Ingreso Total:</span>
+      <span class="metric-value text-success font-bold">{{ totalDepositos() | currency:'USD':'symbol':'1.2-2' }}</span>
     </div>
     <div class="metric-card">
-      <span class="metric-title">Total Débitos</span>
-      <span class="metric-value error">{{ totalRetiros() | currency:'USD':'symbol':'1.2-2' }}</span>
-    </div>
-    <div class="metric-card">
-      <span class="metric-title">Variación</span>
-      <span class="metric-value" [ngClass]="balanceNeto() >= 0 ? 'success' : 'error'">
-        {{ balanceNeto() >= 0 ? '+' : '' }}{{ balanceNeto() | currency:'USD':'symbol':'1.2-2' }}
-      </span>
+      <span class="metric-label">Egreso Total:</span>
+      <span class="metric-value text-danger font-bold">{{ totalRetiros() | currency:'USD':'symbol':'1.2-2' }}</span>
     </div>
   </div>
 
-  <!-- Report Details Panel -->
-  <div class="panel">
-    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 12px; font-family: Georgia, serif;">Detalle de Transacciones</h3>
+  <!-- Accounts List Section -->
+  <div class="accounts-section">
+    <h3 class="section-title">Detalle por Cuentas</h3>
     
-    <div class="table-container">
-      <table class="table-custom report-table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Cliente</th>
-            <th>Número Cuenta</th>
-            <th>Tipo Cuenta</th>
-            <th>Saldo Inicial</th>
-            <th>Estado</th>
-            <th>Movimiento</th>
-            <th>Saldo Disponible</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of detalles(); track item.Fecha + item.Movimiento + item["Numero Cuenta"]) {
-            <tr>
-              <td>{{ item.Fecha }}</td>
-              <td>{{ item.Cliente }}</td>
-              <td>N° {{ item["Numero Cuenta"] }}</td>
-              <td>{{ item.Tipo }}</td>
-              <td>{{ item["Saldo Inicial"] | currency:'USD':'symbol':'1.2-2' }}</td>
-              <td>
-                <span class="badge" [ngClass]="item.Estado ? 'badge-success' : 'badge-danger'">
-                  {{ item.Estado ? 'Activa' : 'Inactiva' }}
-                </span>
-              </td>
-              <td>
-                <strong [style.color]="item.Movimiento >= 0 ? 'var(--success)' : 'var(--error)'">
-                  {{ item.Movimiento >= 0 ? '+' : '' }}{{ item.Movimiento | currency:'USD':'symbol':'1.2-2' }}
-                </strong>
-              </td>
-              <td>{{ item["Saldo Disponible"] | currency:'USD':'symbol':'1.2-2' }}</td>
-            </tr>
-          } @empty {
-            <tr>
-              <td colspan="8" style="text-align: center; color: var(--text-secondary); padding: 32px 0;">
-                No se registraron movimientos para el cliente en el rango de fechas seleccionado.
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+    @for (cuenta of reportData().cuentas; track cuenta.numeroCuenta) {
+      <div class="account-card">
+        <!-- Account Card Header -->
+        <div class="account-header">
+          <div>
+            <strong>Cuenta N° {{ cuenta.numeroCuenta }}</strong> - 
+            {{ cuenta.tipoCuenta }} 
+            <span class="badge" [ngClass]="cuenta.estado ? 'badge-success' : 'badge-danger'">
+              {{ cuenta.estado ? 'Activa' : 'Inactiva' }}
+            </span>
+          </div>
+          <div class="account-balances">
+            <span><strong>Saldo Inicial:</strong> {{ calculateSaldoInicial(cuenta) | currency:'USD':'symbol':'1.2-2' }}</span>
+            <span> | </span>
+            <span><strong>Saldo Actual:</strong> {{ calculateSaldoActual(cuenta) | currency:'USD':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+        
+        <!-- Account Movements Table -->
+        <div class="account-movements">
+          <div class="table-container">
+            <table class="table-custom report-table">
+              <thead>
+                <tr>
+                  <th>Fecha y Hora</th>
+                  <th>Tipo Movimiento</th>
+                  <th style="text-align: right;">Valor</th>
+                  <th style="text-align: right;">Saldo Resultante</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (mov of cuenta.movimientos; track mov.fecha + mov.valor + mov.saldoResultante) {
+                  <tr>
+                    <td>{{ mov.fecha | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                    <td>{{ mov.tipoMovimiento }}</td>
+                    <td [style.color]="(mov.tipoMovimiento || '').toLowerCase().includes('deb') || (mov.tipoMovimiento || '').toLowerCase().includes('ret') ? 'var(--error)' : 'var(--success)'" style="text-align: right; font-weight: bold;">
+                      {{ (mov.tipoMovimiento || '').toLowerCase().includes('deb') || (mov.tipoMovimiento || '').toLowerCase().includes('ret') ? '-' : '+' }}{{ mov.valor | currency:'USD':'symbol':'1.2-2' }}
+                    </td>
+                    <td style="text-align: right; font-weight: bold;">
+                      {{ mov.saldoResultante | currency:'USD':'symbol':'1.2-2' }}
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" class="no-movements-cell">
+                      No se registraron movimientos en el rango de fechas seleccionado.
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-accounts-state">
+        <p>Este cliente no posee cuentas registradas.</p>
+      </div>
+    }
   </div>
 } @else {
   <!-- Empty State Placeholder -->
   <div class="empty-report-state">
     <h3>No se ha generado ningún reporte</h3>
-    <p>Seleccione un cliente y especifique el rango de fechas para generar el estado de cuenta.</p>
   </div>
 }

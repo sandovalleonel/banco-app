@@ -231,17 +231,13 @@ public class MovimientoServiceImpl implements MovimientoService {
             throw new ResourceNotFoundException("Cuenta no encontrada para este movimiento.");
         }
 
-        if (Boolean.FALSE.equals(cuenta.getEstado())) {
-            throw new BusinessRuleException("La cuenta está inactiva y no se pueden realizar operaciones sobre sus movimientos.");
-        }
+
 
         // Revertir el valor del movimiento
         BigDecimal currentBalance = cuenta.getSaldoInicial() != null ? cuenta.getSaldoInicial() : BigDecimal.ZERO;
         BigDecimal newBalance = currentBalance.subtract(existing.getValor()).setScale(2, RoundingMode.HALF_UP);
 
-        if (newBalance.compareTo(BigDecimal.ZERO) < 0) {
-            throw new BusinessRuleException("No se puede eliminar el movimiento porque dejaría la cuenta con saldo negativo.");
-        }
+  
 
         // Actualizar saldo de cuenta
         cuenta.setSaldoInicial(newBalance);

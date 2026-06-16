@@ -24,7 +24,6 @@ export class ReportesComponent implements OnInit {
 
   // Report results state
   reportData = signal<any | null>(null);
-  detalles = signal<ReporteItemDto[]>([]);
   
   // Method to get current date for template
   newDate(): Date {
@@ -46,14 +45,28 @@ export class ReportesComponent implements OnInit {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(today.getDate() - 30);
 
-    const formatDate = (date: Date) => date.toISOString().substring(0, 10);
+    const formatDate = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
 
     this.filterForm = this.fb.group({
       clienteId: ['', [Validators.required]],
       fechaInicio: [formatDate(thirtyDaysAgo), [Validators.required]],
       fechaFin: [formatDate(today), [Validators.required]]
-    });
+    }, { validators: this.dateRangeValidator });
   }
+
+  dateRangeValidator = (group: FormGroup): {[key: string]: any} | null => {
+    const inicio = group.get('fechaInicio')?.value;
+    const fin = group.get('fechaFin')?.value;
+    if (inicio && fin && new Date(inicio) > new Date(fin)) {
+      return { rangeInvalid: true };
+    }
+    return null;
+  };
 
   loadClientes(): void {
     this.clienteService.getAll().subscribe({
@@ -81,11 +94,7 @@ export class ReportesComponent implements OnInit {
         if (res.success) {
           const data = res.data;
           this.reportData.set(data);
-          
-          const items: ReporteItemDto[] = data.detalles || [];
-          this.detalles.set(items);
-          this.calculateMetrics(items);
-          
+          this.calculateMetrics(data.cuentas || []);
           alert('Reporte generado correctamente');
         }
       },
@@ -95,16 +104,22 @@ export class ReportesComponent implements OnInit {
     });
   }
 
-  calculateMetrics(items: ReporteItemDto[]): void {
+  calculateMetrics(cuentas: any[]): void {
     let dep = 0;
     let ret = 0;
 
-    items.forEach(item => {
-      const val = item.Movimiento;
-      if (val >= 0) {
-        dep += val;
-      } else {
-        ret += Math.abs(val);
+    cuentas.forEach(cuenta => {
+      if (cuenta.movimientos) {
+        cuenta.movimientos.forEach((mov: any) => {
+          const val = Number(mov.valor);
+          const tipo = (mov.tipoMovimiento || '').toLowerCase();
+          const isDebit = tipo.includes('deb') || tipo.includes('ret');
+          if (isDebit) {
+            ret += Math.abs(val);
+          } else {
+            dep += Math.abs(val);
+          }
+        });
       }
     });
 
@@ -113,32 +128,50 @@ export class ReportesComponent implements OnInit {
     this.balanceNeto.set(dep - ret);
   }
 
+  calculateSaldoInicial(cuenta: any): number {
+    if (!cuenta.movimientos || cuenta.movimientos.length === 0) {
+      return cuenta.saldoActual;
+    }
+    // Sort movements by date ascending to find the oldest one
+    const sorted = [...cuenta.movimientos].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    const oldest = sorted[0];
+    const tipo = (oldest.tipoMovimiento || '').toLowerCase();
+    const isDebit = tipo.includes('deb') || tipo.includes('ret');
+    if (isDebit) {
+      return oldest.saldoResultante + Math.abs(oldest.valor);
+    } else {
+      return oldest.saldoResultante - Math.abs(oldest.valor);
+    }
+  }
+
+  calculateSaldoActual(cuenta: any): number {
+    if (!cuenta.movimientos || cuenta.movimientos.length === 0) {
+      return cuenta.saldoActual;
+    }
+    // Sort movements by date ascending to find the newest one
+    const sorted = [...cuenta.movimientos].sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
+    const newest = sorted[sorted.length - 1];
+    return newest.saldoResultante;
+  }
+
   descargarPdf(): void {
-    if (!this.reportData()) {
-      alert('Genere un reporte primero antes de descargarlo');
+    const data = this.reportData();
+    if (!data || !data.pdfBase64) {
+      alert('No hay archivo PDF disponible para este reporte');
       return;
     }
 
-    const base64Pdf = this.reportData().pdfBase64 || this.reportData().pdf;
-
-    if (base64Pdf) {
-      try {
-        const linkSource = `data:application/pdf;base64,${base64Pdf}`;
-        const downloadLink = document.createElement('a');
-        const fileName = `Estado_Cuenta_${this.reportData().cliente}_${this.filterForm.value.fechaInicio}_a_${this.filterForm.value.fechaFin}.pdf`;
-        
-        downloadLink.href = linkSource;
-        downloadLink.download = fileName;
-        downloadLink.click();
-        alert('PDF descargado con éxito');
-      } catch (e) {
-        alert('Error al decodificar el PDF del servidor.');
-      }
-    } else {
-      alert('Abriendo asistente de impresión para guardar como PDF...');
-      setTimeout(() => {
-        window.print();
-      }, 500);
+    try {
+      const base64Pdf = data.pdfBase64;
+      const linkSource = `data:application/pdf;base64,${base64Pdf}`;
+      const downloadLink = document.createElement('a');
+      const fileName = `Estado_Cuenta_${(data.cliente || 'Reporte').replace(/\s+/g, '_')}_${this.filterForm.value.fechaInicio}_a_${this.filterForm.value.fechaFin}.pdf`;
+      
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+    } catch (e) {
+      alert('Error al descargar el PDF: ' + (e as Error).message);
     }
   }
 }

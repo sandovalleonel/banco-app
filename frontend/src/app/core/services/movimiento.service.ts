@@ -18,4 +18,8 @@ export class MovimientoService {
   create(movimiento: MovimientoRequest): Observable<GeneralResponseDto<MovimientoDto>> {
     return this.http.post<GeneralResponseDto<MovimientoDto>>(this.apiUrl, movimiento);
   }
+
+  delete(id: number): Observable<GeneralResponseDto<void>> {
+    return this.http.delete<GeneralResponseDto<void>>(`${this.apiUrl}/${id}`);
+  }
 }

@@ -1,75 +1,183 @@
-/* Reportes basic dashboard styles */
+/* Clean & Minimalist Reports Styles */
+.page-title {
+  font-size: 24px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+/* Filters form */
+.filter-card {
+  padding: 16px;
+  border: 1px solid #ccc;
+  background-color: #fafafa;
+  margin-bottom: 20px;
+}
+
+.filters-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.filters-form .form-group {
+  margin-bottom: 0;
+}
+
+.cliente-select-group {
+  flex: 2;
+  min-width: 200px;
+}
+
+.date-group {
+  flex: 1;
+  min-width: 150px;
+}
+
+.form-actions {
+  flex: 1;
+  min-width: 120px;
+}
+
+.form-actions button {
+  width: 100%;
+}
+
+.invalid-feedback-container {
+  margin-top: 10px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+/* Client Details */
+.client-info-container {
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+}
+
+.client-info-container h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.client-details p {
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+/* Metrics Grid - Minimal */
 .metrics-grid {
   display: flex;
-  gap: 20px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
 .metric-card {
   flex: 1;
-  min-width: 200px;
-  background-color: #ffffff;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 15px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  background-color: #fcfcfc;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.metric-title {
-  font-size: 12px;
+.metric-label {
   font-weight: bold;
-  color: var(--text-secondary);
-  text-transform: uppercase;
+  color: #555;
 }
 
 .metric-value {
-  font-size: 20px;
+  font-size: 18px;
+}
+
+.text-success {
+  color: #166534;
+}
+
+.text-danger {
+  color: #991b1b;
+}
+
+.font-bold {
   font-weight: bold;
 }
 
-.metric-value.success {
-  color: var(--success);
+/* Accounts list */
+.accounts-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.metric-value.error {
-  color: var(--error);
+.section-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 4px;
 }
 
-.empty-report-state {
-  padding: 40px;
-  text-align: center;
-  border: 1px dashed var(--border-color);
-  color: var(--text-secondary);
-  border-radius: 4px;
+.account-card {
+  border: 1px solid #ddd;
+  background-color: #fff;
+  margin-bottom: 16px;
 }
 
-.empty-report-state h3 {
-  color: var(--text-primary);
-  font-size: 16px;
-  margin-bottom: 8px;
+.account-header {
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.empty-report-state p {
+.account-balances {
   font-size: 14px;
 }
 
-.print-header {
-  display: none;
+.account-movements {
+  padding: 12px 16px;
 }
 
+/* Table overrides */
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.report-table th {
+  padding: 8px;
+  border-bottom: 2px solid #ccc;
+  text-align: left;
+  font-size: 13px;
+}
+
+.report-table td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+
+.no-movements-cell {
+  text-align: center;
+  color: #777;
+  padding: 20px 0;
+}
+
+.empty-report-state {
+  padding: 30px;
+  text-align: center;
+  color: #666;
+}
+
+/* Print Styles */
 @media print {
-  .print-header {
-    display: block !important;
-  }
-  .metrics-grid {
-    border: 1px solid #000000;
-    padding: 10px;
-    margin-bottom: 20px;
-  }
-  .metric-card {
-    border: none !important;
+  .hide-on-print {
+    display: none !important;
   }
 }
+

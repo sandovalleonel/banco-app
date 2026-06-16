@@ -69,83 +69,90 @@ public class ReportePdfService {
             document.add(infoTable);
 
             // Accounts and Movements
-            for (CuentaEntity cuenta : cuentas) {
-                Paragraph sectionHeader = new Paragraph("Estado de Cuenta - N° " + cuenta.getNumeroCuenta(), sectionFont);
-                sectionHeader.setSpacingBefore(15f);
-                sectionHeader.setSpacingAfter(5f);
-                document.add(sectionHeader);
+            if (cuentas == null || cuentas.isEmpty()) {
+                Paragraph noCuentas = new Paragraph("El cliente no tiene cuentas", sectionFont);
+                noCuentas.setAlignment(Paragraph.ALIGN_CENTER);
+                noCuentas.setSpacingBefore(30f);
+                document.add(noCuentas);
+            } else {
+                for (CuentaEntity cuenta : cuentas) {
+                    Paragraph sectionHeader = new Paragraph("Estado de Cuenta - N° " + cuenta.getNumeroCuenta(), sectionFont);
+                    sectionHeader.setSpacingBefore(15f);
+                    sectionHeader.setSpacingAfter(5f);
+                    document.add(sectionHeader);
 
-                // Cuenta details summary table
-                PdfPTable cuentaInfoTable = new PdfPTable(4);
-                cuentaInfoTable.setWidthPercentage(100);
-                cuentaInfoTable.setSpacingAfter(10f);
+                    // Cuenta details summary table
+                    PdfPTable cuentaInfoTable = new PdfPTable(4);
+                    cuentaInfoTable.setWidthPercentage(100);
+                    cuentaInfoTable.setSpacingAfter(10f);
 
-                // Headers
-                PdfPCell ch1 = new PdfPCell(new Paragraph("Tipo Cuenta", labelFont));
-                PdfPCell ch2 = new PdfPCell(new Paragraph("Saldo Inicial", labelFont));
-                PdfPCell ch3 = new PdfPCell(new Paragraph("Estado", labelFont));
-                PdfPCell ch4 = new PdfPCell(new Paragraph("Número Cuenta", labelFont));
-                for (PdfPCell c : new PdfPCell[]{ch1, ch2, ch3, ch4}) {
-                    c.setBorder(PdfPCell.BOTTOM);
-                    c.setPadding(5f);
-                    cuentaInfoTable.addCell(c);
-                }
-
-                // Values
-                PdfPCell cv1 = new PdfPCell(new Paragraph(cuenta.getTipoCuenta(), valueFont));
-                PdfPCell cv2 = new PdfPCell(new Paragraph("$" + cuenta.getSaldoInicial().toString(), valueFont));
-                PdfPCell cv3 = new PdfPCell(new Paragraph(cuenta.getEstado() ? "Activa" : "Inactiva", valueFont));
-                PdfPCell cv4 = new PdfPCell(new Paragraph(cuenta.getNumeroCuenta(), valueFont));
-                for (PdfPCell c : new PdfPCell[]{cv1, cv2, cv3, cv4}) {
-                    c.setBorder(PdfPCell.NO_BORDER);
-                    c.setPadding(5f);
-                    cuentaInfoTable.addCell(c);
-                }
-
-                document.add(cuentaInfoTable);
-
-                // Filter movements for this account
-                List<MovimientoEntity> accountMovs = movimientos.stream()
-                        .filter(m -> m.getCuenta().getNumeroCuenta().equals(cuenta.getNumeroCuenta()))
-                        .collect(Collectors.toList());
-
-                if (accountMovs.isEmpty()) {
-                    Paragraph noMov = new Paragraph("No se registran movimientos para esta cuenta en el rango de fechas seleccionado.", italicFont);
-                    noMov.setSpacingAfter(15f);
-                    document.add(noMov);
-                } else {
-                    PdfPTable movTable = new PdfPTable(4);
-                    movTable.setWidthPercentage(100);
-                    movTable.setSpacingAfter(15f);
-
-                    // Table Headers
-                    PdfPCell h1 = new PdfPCell(new Paragraph("Fecha", headerFont));
-                    PdfPCell h2 = new PdfPCell(new Paragraph("Tipo de Movimiento", headerFont));
-                    PdfPCell h3 = new PdfPCell(new Paragraph("Valor", headerFont));
-                    PdfPCell h4 = new PdfPCell(new Paragraph("Saldo Disponible", headerFont));
-
-                    for (PdfPCell cell : new PdfPCell[]{h1, h2, h3, h4}) {
-                        cell.setBackgroundColor(tableHeaderBg);
-                        cell.setPadding(6f);
-                        cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
-                        movTable.addCell(cell);
+                    // Headers
+                    PdfPCell ch1 = new PdfPCell(new Paragraph("Tipo Cuenta", labelFont));
+                    PdfPCell ch2 = new PdfPCell(new Paragraph("Saldo Inicial", labelFont));
+                    PdfPCell ch3 = new PdfPCell(new Paragraph("Estado", labelFont));
+                    PdfPCell ch4 = new PdfPCell(new Paragraph("Número Cuenta", labelFont));
+                    for (PdfPCell c : new PdfPCell[]{ch1, ch2, ch3, ch4}) {
+                        c.setBorder(PdfPCell.BOTTOM);
+                        c.setPadding(5f);
+                        cuentaInfoTable.addCell(c);
                     }
 
-                    // Table Data
-                    for (MovimientoEntity m : accountMovs) {
-                        String fechaStr = m.getFecha().format(dtf);
-                        PdfPCell d1 = new PdfPCell(new Paragraph(fechaStr, textFont));
-                        PdfPCell d2 = new PdfPCell(new Paragraph(m.getTipoMovimiento(), textFont));
-                        PdfPCell d3 = new PdfPCell(new Paragraph("$" + m.getValor().toString(), textFont));
-                        PdfPCell d4 = new PdfPCell(new Paragraph("$" + m.getSaldo().toString(), textFont));
+                    // Values
+                    PdfPCell cv1 = new PdfPCell(new Paragraph(cuenta.getTipoCuenta(), valueFont));
+                    PdfPCell cv2 = new PdfPCell(new Paragraph("$" + cuenta.getSaldoInicial().toString(), valueFont));
+                    PdfPCell cv3 = new PdfPCell(new Paragraph(cuenta.getEstado() ? "Activa" : "Inactiva", valueFont));
+                    PdfPCell cv4 = new PdfPCell(new Paragraph(cuenta.getNumeroCuenta(), valueFont));
+                    for (PdfPCell c : new PdfPCell[]{cv1, cv2, cv3, cv4}) {
+                        c.setBorder(PdfPCell.NO_BORDER);
+                        c.setPadding(5f);
+                        cuentaInfoTable.addCell(c);
+                    }
 
-                        for (PdfPCell cell : new PdfPCell[]{d1, d2, d3, d4}) {
-                            cell.setPadding(5f);
+                    document.add(cuentaInfoTable);
+
+                    // Filter movements for this account
+                    List<MovimientoEntity> accountMovs = movimientos.stream()
+                            .filter(m -> m.getCuenta().getNumeroCuenta().equals(cuenta.getNumeroCuenta()))
+                            .collect(Collectors.toList());
+
+                    if (accountMovs.isEmpty()) {
+                        Paragraph noMov = new Paragraph("No se registran movimientos para esta cuenta en el rango de fechas seleccionado.", italicFont);
+                        noMov.setSpacingAfter(15f);
+                        document.add(noMov);
+                    } else {
+                        PdfPTable movTable = new PdfPTable(4);
+                        movTable.setWidthPercentage(100);
+                        movTable.setSpacingAfter(15f);
+
+                        // Table Headers
+                        PdfPCell h1 = new PdfPCell(new Paragraph("Fecha", headerFont));
+                        PdfPCell h2 = new PdfPCell(new Paragraph("Tipo de Movimiento", headerFont));
+                        PdfPCell h3 = new PdfPCell(new Paragraph("Valor", headerFont));
+                        PdfPCell h4 = new PdfPCell(new Paragraph("Saldo Disponible", headerFont));
+
+                        for (PdfPCell cell : new PdfPCell[]{h1, h2, h3, h4}) {
+                            cell.setBackgroundColor(tableHeaderBg);
+                            cell.setPadding(6f);
                             cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
                             movTable.addCell(cell);
                         }
+
+                        // Table Data
+                        for (MovimientoEntity m : accountMovs) {
+                            String fechaStr = m.getFecha().format(dtf);
+                            PdfPCell d1 = new PdfPCell(new Paragraph(fechaStr, textFont));
+                            PdfPCell d2 = new PdfPCell(new Paragraph(m.getTipoMovimiento(), textFont));
+                            PdfPCell d3 = new PdfPCell(new Paragraph("$" + m.getValor().toString(), textFont));
+                            PdfPCell d4 = new PdfPCell(new Paragraph("$" + m.getSaldo().toString(), textFont));
+
+                            for (PdfPCell cell : new PdfPCell[]{d1, d2, d3, d4}) {
+                                cell.setPadding(5f);
+                                cell.setHorizontalAlignment(PdfPCell.ALIGN_CENTER);
+                                movTable.addCell(cell);
+                            }
+                        }
+                        document.add(movTable);
                     }
-                    document.add(movTable);
                 }
             }
 
