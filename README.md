@@ -101,11 +101,11 @@ docker compose up -d --build
 
 ## 🌐 Configuración para Acceso desde Otros Dispositivos (Red Local)
 
-Por defecto, la URL del Back-End está configurada como `http://localhost:8080` en los archivos de entorno de Angular (`environment.ts` y `environment.prod.ts`). Esto significa que la aplicación web solo podrá conectarse con la API si se accede desde el mismo equipo host.
+Por defecto, la URL del Back-End está configurada como `http://localhost:8080` en el archivo de entorno de producción de Angular (`environment.prod.ts`). Esto significa que la aplicación web solo podrá conectarse con la API si se accede desde el mismo equipo host.
 
 Si necesitas probar o acceder a la aplicación desde **otros dispositivos o equipos dentro de tu misma red local**:
 
-1. **Abre el archivo** [environment.prod.ts](file:///c:/local/banco-app/frontend/src/environments/environment.prod.ts) (o [environment.ts](file:///c:/local/banco-app/frontend/src/environments/environment.ts)).
+1. **Abre el archivo de entorno** en la ruta `frontend/src/environments/environment.prod.ts`.
 2. **Reemplaza `localhost`** por la dirección IP local de tu máquina host (por ejemplo, `http://192.168.1.15:8080`).
    ```typescript
    export const environment = {
