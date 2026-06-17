@@ -73,7 +73,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         }
         processValue = processValue.setScale(2, RoundingMode.HALF_UP);
 
-        BigDecimal currentBalance = cuenta.getSaldoInicial() != null ? cuenta.getSaldoInicial() : BigDecimal.ZERO;
+        BigDecimal currentBalance = cuenta.getSaldoActual() != null ? cuenta.getSaldoActual() : BigDecimal.ZERO;
         BigDecimal newBalance = currentBalance.add(processValue).setScale(2, RoundingMode.HALF_UP);
 
         // 3. Reglas de negocio para Débitos
@@ -113,7 +113,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         }
 
         // 4. Actualizar saldo de cuenta
-        cuenta.setSaldoInicial(newBalance);
+        cuenta.setSaldoActual(newBalance);
         cuentaRepository.save(cuenta);
 
         // 5. Persistir Movimiento
@@ -144,7 +144,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         }
 
         // Revertir el valor del movimiento anterior
-        BigDecimal currentBalance = cuenta.getSaldoInicial() != null ? cuenta.getSaldoInicial() : BigDecimal.ZERO;
+        BigDecimal currentBalance = cuenta.getSaldoActual() != null ? cuenta.getSaldoActual() : BigDecimal.ZERO;
         BigDecimal revertedBalance = currentBalance.subtract(existing.getValor());
 
         BigDecimal value = request.getValor();
@@ -209,7 +209,7 @@ public class MovimientoServiceImpl implements MovimientoService {
         }
 
         // Actualizar saldo de cuenta
-        cuenta.setSaldoInicial(newBalance);
+        cuenta.setSaldoActual(newBalance);
         cuentaRepository.save(cuenta);
 
         // Actualizar datos del movimiento (mantenemos la fecha original)
@@ -234,13 +234,13 @@ public class MovimientoServiceImpl implements MovimientoService {
 
 
         // Revertir el valor del movimiento
-        BigDecimal currentBalance = cuenta.getSaldoInicial() != null ? cuenta.getSaldoInicial() : BigDecimal.ZERO;
+        BigDecimal currentBalance = cuenta.getSaldoActual() != null ? cuenta.getSaldoActual() : BigDecimal.ZERO;
         BigDecimal newBalance = currentBalance.subtract(existing.getValor()).setScale(2, RoundingMode.HALF_UP);
 
   
 
         // Actualizar saldo de cuenta
-        cuenta.setSaldoInicial(newBalance);
+        cuenta.setSaldoActual(newBalance);
         cuentaRepository.save(cuenta);
 
         // Eliminar el movimiento

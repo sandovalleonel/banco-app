@@ -98,10 +98,9 @@
         </span>
       </div>
       <div class="account-balances">
-        <span><strong>Saldo Inicial:</strong> {{ calculateSaldoInicial(cuenta) | currency:'USD':'symbol':'1.2-2'
-          }}</span>
+        <span><strong>Saldo Inicial:</strong> {{ cuenta.saldoInicial | currency:'USD':'symbol':'1.2-2' }}</span>
         <span> | </span>
-        <span><strong>Saldo Actual:</strong> {{ calculateSaldoActual(cuenta) | currency:'USD':'symbol':'1.2-2' }}</span>
+        <span><strong>Saldo Actual:</strong> {{ cuenta.saldoActual | currency:'USD':'symbol':'1.2-2' }}</span>
       </div>
     </div>
 

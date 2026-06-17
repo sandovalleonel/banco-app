@@ -14,6 +14,7 @@ export interface CuentaDto {
   numeroCuenta: string;
   tipoCuenta: string;
   saldoInicial: number;
+  saldoActual: number;
   estado: boolean;
   clienteId: number;
 }

@@ -82,16 +82,17 @@ public class ReportePdfService {
                     document.add(sectionHeader);
 
                     // Cuenta details summary table
-                    PdfPTable cuentaInfoTable = new PdfPTable(4);
+                    PdfPTable cuentaInfoTable = new PdfPTable(5);
                     cuentaInfoTable.setWidthPercentage(100);
                     cuentaInfoTable.setSpacingAfter(10f);
 
                     // Headers
                     PdfPCell ch1 = new PdfPCell(new Paragraph("Tipo Cuenta", labelFont));
                     PdfPCell ch2 = new PdfPCell(new Paragraph("Saldo Inicial", labelFont));
-                    PdfPCell ch3 = new PdfPCell(new Paragraph("Estado", labelFont));
-                    PdfPCell ch4 = new PdfPCell(new Paragraph("Número Cuenta", labelFont));
-                    for (PdfPCell c : new PdfPCell[]{ch1, ch2, ch3, ch4}) {
+                    PdfPCell ch3 = new PdfPCell(new Paragraph("Saldo Actual", labelFont));
+                    PdfPCell ch4 = new PdfPCell(new Paragraph("Estado", labelFont));
+                    PdfPCell ch5 = new PdfPCell(new Paragraph("Número Cuenta", labelFont));
+                    for (PdfPCell c : new PdfPCell[]{ch1, ch2, ch3, ch4, ch5}) {
                         c.setBorder(PdfPCell.BOTTOM);
                         c.setPadding(5f);
                         cuentaInfoTable.addCell(c);
@@ -100,9 +101,10 @@ public class ReportePdfService {
                     // Values
                     PdfPCell cv1 = new PdfPCell(new Paragraph(cuenta.getTipoCuenta(), valueFont));
                     PdfPCell cv2 = new PdfPCell(new Paragraph("$" + cuenta.getSaldoInicial().toString(), valueFont));
-                    PdfPCell cv3 = new PdfPCell(new Paragraph(cuenta.getEstado() ? "Activa" : "Inactiva", valueFont));
-                    PdfPCell cv4 = new PdfPCell(new Paragraph(cuenta.getNumeroCuenta(), valueFont));
-                    for (PdfPCell c : new PdfPCell[]{cv1, cv2, cv3, cv4}) {
+                    PdfPCell cv3 = new PdfPCell(new Paragraph("$" + (cuenta.getSaldoActual() != null ? cuenta.getSaldoActual().toString() : "0.00"), valueFont));
+                    PdfPCell cv4 = new PdfPCell(new Paragraph(cuenta.getEstado() ? "Activa" : "Inactiva", valueFont));
+                    PdfPCell cv5 = new PdfPCell(new Paragraph(cuenta.getNumeroCuenta(), valueFont));
+                    for (PdfPCell c : new PdfPCell[]{cv1, cv2, cv3, cv4, cv5}) {
                         c.setBorder(PdfPCell.NO_BORDER);
                         c.setPadding(5f);
                         cuentaInfoTable.addCell(c);

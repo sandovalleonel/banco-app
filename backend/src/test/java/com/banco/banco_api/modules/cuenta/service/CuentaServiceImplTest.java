@@ -48,6 +48,7 @@ class CuentaServiceImplTest {
                 .numeroCuenta("478758")
                 .tipoCuenta("Ahorro")
                 .saldoInicial(new BigDecimal("2000.00"))
+                .saldoActual(new BigDecimal("2000.00"))
                 .estado(true)
                 .clienteId(1L)
                 .build();
@@ -56,6 +57,7 @@ class CuentaServiceImplTest {
                 .numeroCuenta("478758")
                 .tipoCuenta("Ahorro")
                 .saldoInicial(new BigDecimal("2000.00"))
+                .saldoActual(new BigDecimal("2000.00"))
                 .estado(true)
                 .cliente(cliente)
                 .build();

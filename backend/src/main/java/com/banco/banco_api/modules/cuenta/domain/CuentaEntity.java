@@ -34,6 +34,10 @@ public class CuentaEntity {
     @NotNull(message = "El saldo inicial es obligatorio")
     private BigDecimal saldoInicial;
 
+    @Column(name = "saldo_actual", nullable = false, precision = 12, scale = 2)
+    @NotNull(message = "El saldo actual es obligatorio")
+    private BigDecimal saldoActual;
+
     @Column(nullable = false)
     @NotNull(message = "El estado es obligatorio")
     private Boolean estado;

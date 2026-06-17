@@ -88,7 +88,7 @@ public class ClienteServiceImpl implements ClienteService {
         // Verificar restricción: No eliminar si existen cuentas con saldo
         List<CuentaEntity> cuentas = cuentaRepository.findByClienteId(id);
         for (CuentaEntity cuenta : cuentas) {
-            if (cuenta.getSaldoInicial() != null && cuenta.getSaldoInicial().compareTo(BigDecimal.ZERO) > 0) {
+            if (cuenta.getSaldoActual() != null && cuenta.getSaldoActual().compareTo(BigDecimal.ZERO) > 0) {
                 throw new BusinessRuleException("No se permite la eliminación si existen cuentas asociadas con saldos vigentes.");
             }
         }

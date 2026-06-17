@@ -65,7 +65,8 @@ public class ReporteServiceImpl implements ReporteService {
             Map<String, Object> cMap = new HashMap<>();
             cMap.put("numeroCuenta", c.getNumeroCuenta());
             cMap.put("tipoCuenta", c.getTipoCuenta());
-            cMap.put("saldoActual", c.getSaldoInicial());
+            cMap.put("saldoInicial", c.getSaldoInicial());
+            cMap.put("saldoActual", c.getSaldoActual());
             cMap.put("estado", c.getEstado());
 
             // Filter movements belonging to this account

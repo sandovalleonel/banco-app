@@ -27,6 +27,8 @@ public class CuentaDto {
     @NotNull(message = "El saldo inicial es obligatorio")
     private BigDecimal saldoInicial;
 
+    private BigDecimal saldoActual;
+
     @NotNull(message = "El estado es obligatorio")
     private Boolean estado;
 

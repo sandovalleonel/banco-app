@@ -49,6 +49,7 @@ CREATE TABLE cuenta (
     numero_cuenta VARCHAR(20) PRIMARY KEY,
     tipo_cuenta VARCHAR(20) NOT NULL, -- Valores esperados: 'Ahorro' o 'Corriente'
     saldo_inicial NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
+    saldo_actual NUMERIC(12, 2) NOT NULL DEFAULT 0.00,
     estado BOOLEAN NOT NULL DEFAULT TRUE,
     cliente_id BIGINT NOT NULL,
     CONSTRAINT fk_cuenta_cliente FOREIGN KEY (cliente_id) REFERENCES cliente(cliente_id) ON DELETE RESTRICT
@@ -165,25 +166,25 @@ SELECT setval('persona_id_seq', (SELECT MAX(id) FROM persona));
 --- CASO 2: Creación de Cuentas de Usuario
 --- ----------------------------------------------------------------------------
 
--- Cuenta Ahorros de Jose Lema (Saldo Inicial: 2000)
-INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, estado, cliente_id)
-VALUES ('478758', 'Ahorro', 2000.00, TRUE, 1);
+-- Cuenta Ahorros de Jose Lema (Saldo Inicial: 2000, Saldo Actual: 1425 después del movimiento de retiro de 575)
+INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, saldo_actual, estado, cliente_id)
+VALUES ('478758', 'Ahorro', 2000.00, 1425.00, TRUE, 1);
 
 -- Cuenta Corriente de Marianela Montalvo (Saldo Inicial: 100)
-INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, estado, cliente_id)
-VALUES ('225487', 'Corriente', 100.00, TRUE, 2);
+INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, saldo_actual, estado, cliente_id)
+VALUES ('225487', 'Corriente', 100.00, 100.00, TRUE, 2);
 
 -- Cuenta Ahorros de Juan Osorio (Saldo Inicial: 0)
-INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, estado, cliente_id)
-VALUES ('495878', 'Ahorros', 0.00, TRUE, 3);
+INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, saldo_actual, estado, cliente_id)
+VALUES ('495878', 'Ahorros', 0.00, 0.00, TRUE, 3);
 
 -- Segunda Cuenta (Ahorros) de Marianela Montalvo (Saldo Inicial: 540)
-INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, estado, cliente_id)
-VALUES ('496825', 'Ahorros', 540.00, TRUE, 2);
+INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, saldo_actual, estado, cliente_id)
+VALUES ('496825', 'Ahorros', 540.00, 540.00, TRUE, 2);
 
 -- Cuenta Corriente Extra de Jose Lema (Caso 3 del ejercicio)
-INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, estado, cliente_id)
-VALUES ('585545', 'Corriente', 1000.00, TRUE, 1);
+INSERT INTO cuenta (numero_cuenta, tipo_cuenta, saldo_inicial, saldo_actual, estado, cliente_id)
+VALUES ('585545', 'Corriente', 1000.00, 1000.00, TRUE, 1);
 
 
 --- ----------------------------------------------------------------------------
@@ -191,18 +192,6 @@ VALUES ('585545', 'Corriente', 1000.00, TRUE, 1);
 --- ----------------------------------------------------------------------------
 
 -- Nota: Como Senior, los saldos en movimientos reflejan el cálculo post-operación.
--- Movimiento 1: Retiro de 575 en la cuenta de Jose Lema (478758). Saldo inicial 2000 -> Restante 1425
+-- Movimiento 1: Retiro de 575 en la cuenta de Jose Lema (478758). Saldo inicial 2000 -> Restante 1425. Fecha: 16-06-2026
 INSERT INTO movimientos (fecha, tipo_movimiento, valor, saldo, numero_cuenta)
-VALUES ('2026-02-10 09:00:00', 'Débito', -575.00, 1425.00, '478758');
-
--- Movimiento 2: Depósito de 600 en cuenta Corriente de Marianela (225487). Saldo inicial 100 -> Restante 700
-INSERT INTO movimientos (fecha, tipo_movimiento, valor, saldo, numero_cuenta)
-VALUES ('2026-02-10 10:15:00', 'Crédito', 600.00, 700.00, '225487');
-
--- Movimiento 3: Depósito de 150 en cuenta Ahorros de Juan Osorio (495878). Saldo inicial 0 -> Restante 150
-INSERT INTO movimientos (fecha, tipo_movimiento, valor, saldo, numero_cuenta)
-VALUES ('2026-02-12 11:30:00', 'Crédito', 150.00, 150.00, '495878');
-
--- Movimiento 4: Retiro de 540 en cuenta Ahorros de Marianela (496825). Saldo inicial 540 -> Restante 0
-INSERT INTO movimientos (fecha, tipo_movimiento, valor, saldo, numero_cuenta)
-VALUES ('2026-02-08 14:00:00', 'Débito', -540.00, 0.00, '496825');
+VALUES ('2026-06-16 09:00:00', 'Débito', -575.00, 1425.00, '478758');

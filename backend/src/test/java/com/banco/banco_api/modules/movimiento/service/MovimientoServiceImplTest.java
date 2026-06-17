@@ -54,6 +54,7 @@ class MovimientoServiceImplTest {
         cuenta = CuentaEntity.builder()
                 .numeroCuenta("478758")
                 .saldoInicial(new BigDecimal("1000.00"))
+                .saldoActual(new BigDecimal("1000.00"))
                 .estado(true)
                 .cliente(cliente)
                 .build();

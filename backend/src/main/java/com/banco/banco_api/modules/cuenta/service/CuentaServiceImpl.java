@@ -66,6 +66,7 @@ public class CuentaServiceImpl implements CuentaService {
                 .numeroCuenta(accountDto.getNumeroCuenta())
                 .tipoCuenta(accountDto.getTipoCuenta())
                 .saldoInicial(accountDto.getSaldoInicial())
+                .saldoActual(accountDto.getSaldoActual() != null ? accountDto.getSaldoActual() : accountDto.getSaldoInicial())
                 .estado(accountDto.getEstado())
                 .cliente(cliente)
                 .build();
@@ -92,6 +93,9 @@ public class CuentaServiceImpl implements CuentaService {
 
         existing.setTipoCuenta(accountDto.getTipoCuenta());
         existing.setSaldoInicial(accountDto.getSaldoInicial());
+        if (accountDto.getSaldoActual() != null) {
+            existing.setSaldoActual(accountDto.getSaldoActual());
+        }
         existing.setEstado(accountDto.getEstado());
         existing.setCliente(cliente);
 
@@ -129,6 +133,7 @@ public class CuentaServiceImpl implements CuentaService {
                 .numeroCuenta(entity.getNumeroCuenta())
                 .tipoCuenta(entity.getTipoCuenta())
                 .saldoInicial(entity.getSaldoInicial())
+                .saldoActual(entity.getSaldoActual())
                 .estado(entity.getEstado())
                 .clienteId(entity.getCliente() != null ? entity.getCliente().getId() : null)
                 .build();
