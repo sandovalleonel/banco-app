@@ -54,6 +54,17 @@ Una vez levantado el entorno, puedes acceder a los servicios desde tu navegador 
 
 ---
 
+## 🧪 Pruebas de API con Postman
+
+Se incluye una suite de pruebas rápidas y preconfiguradas para Postman en la carpeta del proyecto. Para utilizarlas:
+
+1. **Importa los archivos**: Abre Postman, ve a la opción de **Import** y selecciona los **2 archivos** presentes en la carpeta [backend/postman/](file:///c:/local/banco-app/backend/postman/):
+   - `banco-api.postman_collection.json` (La colección con todos los endpoints mapeados para el cliente Leonel Sandoval).
+   - `banco-api.postman_environment.json` (Las variables de entorno con la URL base preconfigurada).
+2. **Configura el entorno**: En la esquina superior derecha de Postman, selecciona el entorno activo llamado **"Banco API - Entorno"** para que las peticiones resuelvan automáticamente la dirección y puerto de la API.
+
+---
+
 ## 🔄 Procedimiento para Actualizaciones
 
 El despliegue está configurado para permitir actualizaciones independientes del Front-End o del Back-End de forma profesional, reconstruyendo solo lo necesario y minimizando tiempos:
@@ -85,3 +96,24 @@ docker compose up -d --build
 - **`banco-db`**: Contenedor Postgres que monta el script SQL local en `/docker-entrypoint-initdb.d/` para su ejecución automática en el primer arranque.
 - **`banco-backend`**: Contenedor Spring Boot que espera a que `banco-db` pase su control de salud (`healthcheck`) para arrancar de forma segura.
 - **`banco-frontend`**: Contenedor Nginx independiente que se compila y levanta de forma asíncrona sin bloquearse por el estado del Back-End.
+
+---
+
+## 🌐 Configuración para Acceso desde Otros Dispositivos (Red Local)
+
+Por defecto, la URL del Back-End está configurada como `http://localhost:8080` en los archivos de entorno de Angular (`environment.ts` y `environment.prod.ts`). Esto significa que la aplicación web solo podrá conectarse con la API si se accede desde el mismo equipo host.
+
+Si necesitas probar o acceder a la aplicación desde **otros dispositivos o equipos dentro de tu misma red local**:
+
+1. **Abre el archivo** [environment.prod.ts](file:///c:/local/banco-app/frontend/src/environments/environment.prod.ts) (o [environment.ts](file:///c:/local/banco-app/frontend/src/environments/environment.ts)).
+2. **Reemplaza `localhost`** por la dirección IP local de tu máquina host (por ejemplo, `http://192.168.1.15:8080`).
+   ```typescript
+   export const environment = {
+     apiUrl: 'http://<TU_IP_LOCAL>:8080'
+   };
+   ```
+3. **Reconstruye y levanta** el contenedor del frontend para aplicar los cambios:
+   ```bash
+   docker compose up -d --build banco-frontend
+   ```
+De esta manera, los dispositivos externos de tu red local podrán resolver y consumir la API del servidor correctamente.

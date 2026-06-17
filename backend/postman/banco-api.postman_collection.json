@@ -57,7 +57,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"1723456789\",\n  \"nombre\": \"Jose Lema\",\n  \"genero\": \"Masculino\",\n  \"edad\": 35,\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"1234\",\n  \"estado\": true\n}"
+              "raw": "{\n  \"identificacion\": \"1755555555\",\n  \"nombre\": \"Leonel Sandoval\",\n  \"genero\": \"Masculino\",\n  \"edad\": 35,\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"1234\",\n  \"estado\": true\n}"
             },
             "url": {
               "raw": "{{banco_base_url}}/clientes",
@@ -84,35 +84,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"identificacion\": \"1723456789\",\n  \"nombre\": \"Jose Lema Editado\",\n  \"genero\": \"Masculino\",\n  \"edad\": 36,\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"1234\",\n  \"estado\": true\n}"
-            },
-            "url": {
-              "raw": "{{banco_base_url}}/clientes/1",
-              "host": [
-                "{{banco_base_url}}"
-              ],
-              "path": [
-                "clientes",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Modificar Cliente Parcialmente (Patch)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json",
-                "type": "text"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nombre\": \"Jose Lema Modificado\"\n}"
+              "raw": "{\n  \"identificacion\": \"1766666666\",\n  \"nombre\": \"Leonel Sandoval Editado\",\n  \"genero\": \"Masculino\",\n  \"edad\": 36,\n  \"direccion\": \"Otavalo sn y principal\",\n  \"telefono\": \"098254785\",\n  \"contrasena\": \"1234\",\n  \"estado\": true\n}"
             },
             "url": {
               "raw": "{{banco_base_url}}/clientes/1",
@@ -198,7 +170,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"numeroCuenta\": \"478758\",\n  \"tipoCuenta\": \"Ahorro\",\n  \"saldoInicial\": 2000.00,\n  \"estado\": true,\n  \"clienteId\": 1\n}"
+              "raw": "{\n  \"numeroCuenta\": \"999999\",\n  \"tipoCuenta\": \"Ahorro\",\n  \"saldoInicial\": 2000.00,\n  \"estado\": true,\n  \"clienteId\": 1\n}"
             },
             "url": {
               "raw": "{{banco_base_url}}/cuentas",
